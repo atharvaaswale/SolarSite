@@ -12,3 +12,19 @@ val Pink40 = Color(0xFF7D5260)
 
 //app colours
 val mainGreen = Color(0xFF4CAF8C)
+
+val LightBlueContainer = Color(0xFFE8F0FE)
+val DarkBlueContainer = Color(0xFFCCE5FF)
+val OrangeContainer = Color(0xFFFFDBCA)
+
+val BlueGrey = Color(0xFF565E74)
+val DullBlue = Color(0xFF565E74)
+val DullOrange = Color(0xFFB45309)
+
+
+val GreyText = Color(0xFF564338)
+val BlueText = Color(0xFF004B73)
+val OrangeText = Color(0xFF763300)
+
+
+val DarkBlueText = Color(0xFF0B1C30)
