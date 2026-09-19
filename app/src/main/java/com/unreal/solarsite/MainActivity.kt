@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -82,7 +83,7 @@ fun MainLayout() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(TopLevelDestination.SITES.route) {
-                Dashboard()
+                Dashboard(LocalContext.current)
             }
             composable(TopLevelDestination.MAP.route) {
                 Text(text = "Map Screen Content", modifier = Modifier.padding(16.dp))

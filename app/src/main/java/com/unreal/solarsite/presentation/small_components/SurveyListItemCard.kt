@@ -70,7 +70,13 @@ fun SurveyListItemCard(
                     painter = painterResource(icon),
                     contentDescription = "leadingIcon",
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(24.dp),
+                    tint = when (statusText) {
+                        "Draft" -> BlueGrey
+                        "Synced" -> DullBlue
+                        "Ready for review" -> DullOrange
+                        else -> BlueGrey
+                    }
                 )
             }
 
@@ -101,7 +107,7 @@ fun SurveyListItemCard(
                             },
                             shape = RoundedCornerShape(50.dp)
                         )
-                        .padding(horizontal = 8.dp, vertical = 5.dp)
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
                     Box(
                         modifier = Modifier
@@ -120,6 +126,7 @@ fun SurveyListItemCard(
                     Text(
                         text = statusText,
                         fontWeight = FontWeight.W600,
+                        fontSize = 10.sp,
                         color = when (statusText) {
                             "Draft" -> GreyText
                             "Synced" -> BlueText

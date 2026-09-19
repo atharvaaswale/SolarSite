@@ -1,5 +1,7 @@
 package com.unreal.solarsite.presentation
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,7 +37,7 @@ import com.unreal.solarsite.presentation.small_components.SurveyListItemCard
 import com.unreal.solarsite.ui.theme.DarkBlueText
 
 @Composable
-fun Dashboard(){
+fun Dashboard(context: Context){
     data class FacilityItem(
         val id: String,
         val name: String,
@@ -82,7 +85,7 @@ fun Dashboard(){
     )
 
     Column (
-        modifier = Modifier.padding(horizontal = 5.dp)
+        modifier = Modifier.padding(horizontal = 10.dp)
     ) {
         //Cached sites - Image Cards
         Box(
@@ -140,7 +143,7 @@ fun Dashboard(){
         Text(
             text = "Recent Surveys",
             color = DarkBlueText,
-            fontWeight = FontWeight.W600,
+            fontWeight = FontWeight.W700,
             fontSize = 18.sp,
             modifier = Modifier
                 .padding(vertical = 10.dp)
@@ -148,7 +151,7 @@ fun Dashboard(){
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+            contentPadding = PaddingValues(vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(facilityList, key = {it.id}) { item ->
@@ -156,7 +159,7 @@ fun Dashboard(){
                     item.name,
                     item.status,
                     item.iconRes,
-                    {}
+                    { Toast.makeText(context, item.name, Toast.LENGTH_SHORT)}
                 )
             }
         }
@@ -168,5 +171,5 @@ fun Dashboard(){
 @Composable
 @Preview(showSystemUi = true)
 fun showDashboard() {
-    Dashboard()
+    Dashboard(LocalContext.current)
 }

@@ -18,7 +18,7 @@ val DarkBlueContainer = Color(0xFFCCE5FF)
 val OrangeContainer = Color(0xFFFFDBCA)
 
 val BlueGrey = Color(0xFF565E74)
-val DullBlue = Color(0xFF565E74)
+val DullBlue = Color(0xFF005B8C)
 val DullOrange = Color(0xFFB45309)
 
 
