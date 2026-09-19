@@ -13,6 +13,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,7 +33,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             SolarSiteTheme {
                 MainLayout()
-
             }
         }
     }
@@ -58,6 +58,7 @@ fun MainLayout() {
                 }
             )
         },
+        containerColor = Color(0xFFF8F9FF),
         bottomBar = {
             SolarSiteBottomBar(
                 currentRoute = currentRoute,
