@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.unreal.solarsite.R
 import com.unreal.solarsite.ui.theme.BlueGrey
 import com.unreal.solarsite.ui.theme.BlueText
@@ -39,13 +40,15 @@ import com.unreal.solarsite.ui.theme.OrangeText
 fun SurveyListItemCard(
     title: String,
     statusText: String,
-    icon: Int
+    icon: Int,
+    onClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         color = Color.White,
         shadowElevation = 1.dp,
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -65,7 +68,7 @@ fun SurveyListItemCard(
             ) {
                 Icon(
                     painter = painterResource(icon),
-                    contentDescription = "trailingIcon",
+                    contentDescription = "leadingIcon",
                     modifier = Modifier
                         .size(24.dp)
                 )
@@ -80,6 +83,7 @@ fun SurveyListItemCard(
                 Text(
                     text = title,
                     fontWeight = FontWeight.W700,
+                    fontSize = 16.sp,
                     color = DarkBlueText,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -126,6 +130,12 @@ fun SurveyListItemCard(
                 }
             }
 
+            Icon(
+                painter = painterResource(R.drawable.ic_keyboard_arrow_right),
+                contentDescription = "Inspect Survey",
+                tint = Color(0xFF94A3B8),
+                modifier = Modifier.size(20.dp)
+            )
 
         }
     }
@@ -137,6 +147,7 @@ fun ShowSurveyListItemCard() {
     SurveyListItemCard(
         "Northstar Manufacturing",
         "Ready for review",
-        R.drawable.ic_factory
+        R.drawable.ic_factory,
+        {}
     )
 }

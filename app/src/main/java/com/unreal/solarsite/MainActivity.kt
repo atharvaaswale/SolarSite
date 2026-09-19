@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.unreal.solarsite.presentation.Dashboard
 import com.unreal.solarsite.presentation.navigation.SolarSiteBottomBar
 import com.unreal.solarsite.presentation.navigation.TopLevelDestination
 import com.unreal.solarsite.ui.theme.SolarSiteTheme
@@ -81,7 +82,7 @@ fun MainLayout() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(TopLevelDestination.SITES.route) {
-                Text(text = "Sites Screen Content", modifier = Modifier.padding(16.dp))
+                Dashboard()
             }
             composable(TopLevelDestination.MAP.route) {
                 Text(text = "Map Screen Content", modifier = Modifier.padding(16.dp))

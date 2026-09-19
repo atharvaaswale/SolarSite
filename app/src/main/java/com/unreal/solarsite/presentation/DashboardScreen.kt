@@ -2,13 +2,17 @@ package com.unreal.solarsite.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -26,9 +30,57 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unreal.solarsite.R
+import com.unreal.solarsite.presentation.small_components.SurveyListItemCard
+import com.unreal.solarsite.ui.theme.DarkBlueText
 
 @Composable
 fun Dashboard(){
+    data class FacilityItem(
+        val id: String,
+        val name: String,
+        val status: String,          // "Draft" | "Synced" | "Ready for review"
+        val iconRes: Int             // replace with your actual drawable resources
+    )
+    val facilityList = listOf(
+        FacilityItem(
+            id = "1",
+            name = "Northstar Manufacturing",
+            status = "Draft",
+            iconRes = R.drawable.ic_factory          // factory icon
+        ),
+        FacilityItem(
+            id = "2",
+            name = "Greenfield Warehouse",
+            status = "Synced",
+            iconRes = R.drawable.ic_warehouse        // warehouse icon
+        ),
+        FacilityItem(
+            id = "3",
+            name = "Riverside Solar",
+            status = "Ready for review",
+            iconRes = R.drawable.ic_nav_sites            // solar panel icon
+        ),
+        FacilityItem(
+            id = "4",
+            name = "Apex Facility",
+            status = "Draft",
+            iconRes = R.drawable.ic_appartments         // building icon
+        ),
+        // extra items
+        FacilityItem(
+            id = "5",
+            name = "Horizon Logistics",
+            status = "Synced",
+            iconRes = R.drawable.ic_warehouse
+        ),
+        FacilityItem(
+            id = "6",
+            name = "Summit Power Plant",
+            status = "Ready for review",
+            iconRes = R.drawable.ic_nav_sites
+        )
+    )
+
     Column (
         modifier = Modifier.padding(horizontal = 5.dp)
     ) {
@@ -84,7 +136,30 @@ fun Dashboard(){
             )
         }
 
-        //
+        // Recent Surveys List
+        Text(
+            text = "Recent Surveys",
+            color = DarkBlueText,
+            fontWeight = FontWeight.W600,
+            fontSize = 18.sp,
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+        )
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(facilityList, key = {it.id}) { item ->
+                SurveyListItemCard(
+                    item.name,
+                    item.status,
+                    item.iconRes,
+                    {}
+                )
+            }
+        }
     }
 
 
