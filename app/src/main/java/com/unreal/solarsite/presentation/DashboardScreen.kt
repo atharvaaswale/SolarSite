@@ -37,13 +37,14 @@ import com.unreal.solarsite.presentation.small_components.SurveyListItemCard
 import com.unreal.solarsite.ui.theme.DarkBlueText
 
 @Composable
-fun Dashboard(context: Context){
+fun Dashboard(context: Context) {
     data class FacilityItem(
         val id: String,
         val name: String,
         val status: String,          // "Draft" | "Synced" | "Ready for review"
         val iconRes: Int             // replace with your actual drawable resources
     )
+
     val facilityList = listOf(
         FacilityItem(
             id = "1",
@@ -81,92 +82,141 @@ fun Dashboard(context: Context){
             name = "Summit Power Plant",
             status = "Ready for review",
             iconRes = R.drawable.ic_nav_sites
+        ),
+        FacilityItem(
+            id = "7",
+            name = "Apex Wind Farm Substation",
+            status = "In Progress",
+            iconRes = R.drawable.ic_nav_sites
+        ),
+        FacilityItem(
+            id = "8",
+            name = "Solaris Grid Array B",
+            status = "Review Overdue",
+            iconRes = R.drawable.ic_nav_sites
+        ),
+        FacilityItem(
+            id = "9",
+            name = "Hydro-Electric Dam Unit 4",
+            status = "Ready for review",
+            iconRes = R.drawable.ic_nav_sites
+        ),
+        FacilityItem(
+            id = "10",
+            name = "Delta Distribution Center",
+            status = "Draft",
+            iconRes = R.drawable.ic_nav_sites
+        ),
+        FacilityItem(
+            id = "11",
+            name = "Pinnacle Automotive Plant",
+            status = "Ready for review",
+            iconRes = R.drawable.ic_nav_sites
+        ),
+        FacilityItem(
+            id = "12",
+            name = "Nexus Cold Storage Facility",
+            status = "Approved",
+            iconRes = R.drawable.ic_nav_sites
         )
     )
 
-    Column (
-        modifier = Modifier.padding(horizontal = 10.dp)
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 10.dp),
+        contentPadding = PaddingValues(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         //Cached sites - Image Cards
-        Box(
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth()
-                .background(Color.White)
-                .clip(RoundedCornerShape(18.dp))
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.solar_site_1),
-                contentDescription = "Sample Image",
-                contentScale = ContentScale.Crop, // Ensures the image fills the space cleanly
-                modifier = Modifier.fillMaxSize()
-            )
-
-            Text(
-                text = "4 active surveys",
-                color = Color.White,
+        item {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp),
-                fontWeight = FontWeight.W500
-            )
-        }
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .clip(RoundedCornerShape(18.dp))
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.solar_site_1),
+                    contentDescription = "Sample Image",
+                    contentScale = ContentScale.Crop, // Ensures the image fills the space cleanly
+                    modifier = Modifier.fillMaxSize()
+                )
 
-        //New survey button
-        Button(
-            onClick = {},
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF29B05E),
-                contentColor = Color.White
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .padding(top = 10.dp),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_add_circle),
-                contentDescription = "circle add",
-                modifier = Modifier
-                    .size(30.dp)
-                    .padding(end = 5.dp)
-            )
-            Text(
-                text = "New Survey",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.W700
-            )
-        }
-
-        // Recent Surveys List
-        Text(
-            text = "Recent Surveys",
-            color = DarkBlueText,
-            fontWeight = FontWeight.W700,
-            fontSize = 18.sp,
-            modifier = Modifier
-                .padding(vertical = 10.dp)
-        )
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(facilityList, key = {it.id}) { item ->
-                SurveyListItemCard(
-                    item.name,
-                    item.status,
-                    item.iconRes,
-                    { Toast.makeText(context, item.name, Toast.LENGTH_SHORT)}
+                Text(
+                    text = "4 active surveys",
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(16.dp),
+                    fontWeight = FontWeight.W500
                 )
             }
         }
+
+
+        //New survey button
+        item {
+            Button(
+                onClick = {},
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF29B05E),
+                    contentColor = Color.White
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .padding(top = 10.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_add_circle),
+                    contentDescription = "circle add",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .padding(end = 5.dp)
+                )
+                Text(
+                    text = "New Survey",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.W700
+                )
+            }
+        }
+
+
+        item {
+            Text(
+                text = "Recent Surveys",
+                color = DarkBlueText,
+                fontWeight = FontWeight.W700,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+            )
+        }
+        // Recent Surveys List
+
+
+        /*LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {*/
+        items(facilityList, key = { it.id }) { item ->
+            SurveyListItemCard(
+                item.name,
+                item.status,
+                item.iconRes,
+                { Toast.makeText(context, item.name, Toast.LENGTH_SHORT) }
+            )
+        }
     }
-
-
 }
+
+
+//}
 
 @Composable
 @Preview(showSystemUi = true)

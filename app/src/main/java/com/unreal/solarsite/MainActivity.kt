@@ -52,7 +52,7 @@ fun MainLayout() {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Dashboard",
+                        text = "Solar Site",
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -79,14 +79,14 @@ fun MainLayout() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = TopLevelDestination.SITES.route,
+            startDestination = TopLevelDestination.HOME.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(TopLevelDestination.SITES.route) {
+            composable(TopLevelDestination.HOME.route) {
                 Dashboard(LocalContext.current)
             }
-            composable(TopLevelDestination.MAP.route) {
-                Text(text = "Map Screen Content", modifier = Modifier.padding(16.dp))
+            composable(TopLevelDestination.SITES.route) {
+                Text(text = "Sites Screen Content", modifier = Modifier.padding(16.dp))
             }
             composable(TopLevelDestination.SYNC.route) {
                 Text(text = "Sync Screen Content", modifier = Modifier.padding(16.dp))

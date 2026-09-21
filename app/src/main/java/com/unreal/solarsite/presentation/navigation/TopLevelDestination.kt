@@ -8,7 +8,7 @@ enum class TopLevelDestination(
     val label: String,
     @DrawableRes val iconRes: Int
 ) {
+    HOME("home", "Home", R.drawable.ic_home),
     SITES("sites", "Sites", R.drawable.ic_nav_sites),
-    MAP("map", "Map", R.drawable.ic_nav_map),
     SYNC("sync", "Sync", R.drawable.ic_nav_sync)
 }
