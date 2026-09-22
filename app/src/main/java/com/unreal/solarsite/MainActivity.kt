@@ -46,13 +46,17 @@ fun MainLayout() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    // Resolve the active screen title dynamically
+    val currentTopBarTitle = TopLevelDestination.entries
+        .firstOrNull { it.route == currentRoute }
+        ?.label ?: "SolarSite"
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Solar Site",
+                        text = currentTopBarTitle,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold
                         )
