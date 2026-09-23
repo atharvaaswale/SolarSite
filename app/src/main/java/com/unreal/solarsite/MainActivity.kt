@@ -24,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.unreal.solarsite.presentation.Dashboard
+import com.unreal.solarsite.presentation.SitesScreen
 import com.unreal.solarsite.presentation.navigation.SolarSiteBottomBar
 import com.unreal.solarsite.presentation.navigation.TopLevelDestination
 import com.unreal.solarsite.ui.theme.SolarSiteTheme
@@ -57,7 +58,7 @@ fun MainLayout() {
                 title = {
                     Text(
                         text = currentTopBarTitle,
-                        style = MaterialTheme.typography.headlineMedium.copy(
+                        style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold
                         )
                     )
@@ -90,7 +91,7 @@ fun MainLayout() {
                 Dashboard(LocalContext.current)
             }
             composable(TopLevelDestination.SITES.route) {
-                Text(text = "Sites Screen Content", modifier = Modifier.padding(16.dp))
+                SitesScreen()
             }
             composable(TopLevelDestination.SYNC.route) {
                 Text(text = "Sync Screen Content", modifier = Modifier.padding(16.dp))
