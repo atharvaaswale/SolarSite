@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +51,7 @@ import com.unreal.solarsite.presentation.small_components.SiteCard
 import com.unreal.solarsite.presentation.small_components.SiteItemUiModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.collections.emptyList
 
 @Composable
@@ -57,8 +59,9 @@ fun SitesScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var sitesList by remember {mutableStateOf<List<SitesDao.Data>>(emptyList())}
+    var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-
     var isSatellite by remember { mutableStateOf(false) }
     val mapProperties = remember(isSatellite) {
         MapProperties(
@@ -119,15 +122,23 @@ fun SitesScreen() {
         }
 
         //API Call
-        scope.launch(Dispatchers.IO) {
-            try {
-                val response = ApiClient.apiService.getSites()
-                if (response.isSuccessful && response.body() !== null) {
-                    if (response.body()!!.success) sitesList = response.body()!!.data
-                }
-            } catch (e: Exception) {
-                Log.e("ERROR_SITE_SCREEN", e.message!!)
+        try {
+            isLoading = true
+            val response = withContext(Dispatchers.IO) {
+                ApiClient.apiService.getSites()
             }
+
+            if (response.isSuccessful && response.body() != null) {
+                if (response.body()!!.success) {
+                    sitesList = response.body()!!.data
+                }
+            }
+            error = null
+        } catch (e: Exception) {
+            Log.e("ERROR_SITE_SCREEN", e.message ?: "Unknown error")
+            error = e.message
+        } finally {
+            isLoading = false
         }
     }
 
@@ -173,23 +184,43 @@ fun SitesScreen() {
             )
 
             // 3. Sites List Section (70% Height Ratio)
-            LazyColumn(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.7f),
-                contentPadding = PaddingValues(start = 10.dp, end = 10.dp, top = 8.dp, bottom = 80.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                    .weight(0.7f)          // ← weight lives here
             ) {
-                items(
-                    items = sitesList,
-                    key = { it.id }
-                ) { site ->
-                    SiteCard(
-                        site = site,
-                        onEditClick = { siteId -> /* Handle edit */ },
-                        onDeleteClick = { siteId -> /* Handle delete */ }
-                    )
+                when {
+                    isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                    error != null -> {
+                        Text(
+                            text = error ?: "Error",
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                                //.weight(0.7f),
+                            contentPadding = PaddingValues(start = 10.dp, end = 10.dp, top = 8.dp, bottom = 80.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(
+                                items = sitesList,
+                                key = { it.id }
+                            ) { site ->
+                                SiteCard(
+                                    site = site,
+                                    onEditClick = { siteId -> /* Handle edit */ },
+                                    onDeleteClick = { siteId -> /* Handle delete */ }
+                                )
+                            }
+                        }
+                    }
                 }
+
             }
         }
     }

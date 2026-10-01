@@ -63,4 +63,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter)
     implementation(libs.coil.compose)
+    implementation(libs.logging.interceptor)
+
 }

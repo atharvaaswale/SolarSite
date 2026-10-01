@@ -110,7 +110,9 @@ fun SiteCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "${site.siteAssessments.roofType} | ${site.siteAssessments.capacityKwp} kWp",
+                    text = site.siteAssessments?.let {
+                        "${it.roofType} | ${it.capacityKwp} kWp"
+                    } ?: "No assessment data",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF64748B),
                     maxLines = 1,

@@ -32,7 +32,7 @@ data class SitesDao(
         @SerialName("primary_image_url")
         val primaryImageUrl: String,
         @SerialName("site_assessments")
-        val siteAssessments: SiteAssessments,
+        val siteAssessments: SiteAssessments? = null,
         @SerialName("status")
         val status: String,
         @SerialName("updated_at")
