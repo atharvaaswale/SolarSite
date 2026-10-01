@@ -2,6 +2,8 @@ package com.unreal.solarsite.presentation
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -21,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,12 +44,19 @@ import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.unreal.solarsite.R
+import com.unreal.solarsite.data.dao.SitesDao
+import com.unreal.solarsite.data.remote.ApiClient
 import com.unreal.solarsite.presentation.small_components.SiteCard
 import com.unreal.solarsite.presentation.small_components.SiteItemUiModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.collections.emptyList
 
 @Composable
 fun SitesScreen() {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var sitesList by remember {mutableStateOf<List<SitesDao.Data>>(emptyList())}
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
     var isSatellite by remember { mutableStateOf(false) }
@@ -80,7 +90,7 @@ fun SitesScreen() {
     ) { isGranted ->
         if (isGranted) {
             // Permission approved, fetch the location
-            try {
+             try {
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     location?.let {
                         val currentLatLng = LatLng(it.latitude, it.longitude)
@@ -107,7 +117,20 @@ fun SitesScreen() {
         } else {
             locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
+
+        //API Call
+        scope.launch(Dispatchers.IO) {
+            try {
+                val response = ApiClient.apiService.getSites()
+                if (response.isSuccessful && response.body() !== null) {
+                    if (response.body()!!.success) sitesList = response.body()!!.data
+                }
+            } catch (e: Exception) {
+                Log.e("ERROR_SITE_SCREEN", e.message!!)
+            }
+        }
     }
+
 
 
     Box(
@@ -158,7 +181,7 @@ fun SitesScreen() {
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(
-                    items = mockSites,
+                    items = sitesList,
                     key = { it.id }
                 ) { site ->
                     SiteCard(

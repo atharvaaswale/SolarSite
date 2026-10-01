@@ -33,7 +33,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.unreal.solarsite.R
+import com.unreal.solarsite.data.dao.SitesDao
+import com.unreal.solarsite.toCustomSentenceCase
 import com.unreal.solarsite.ui.theme.BlueGrey
 import com.unreal.solarsite.ui.theme.BlueText
 import com.unreal.solarsite.ui.theme.DarkBlueContainer
@@ -56,7 +59,7 @@ data class SiteItemUiModel(
 
 @Composable
 fun SiteCard(
-    site: SiteItemUiModel,
+    site: SitesDao.Data,
     onEditClick: (String) -> Unit,
     onDeleteClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -83,8 +86,8 @@ fun SiteCard(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(site.imageRes!!),
+                AsyncImage(
+                    model = site.primaryImageUrl,
                     contentDescription = "leadingIcon",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))
@@ -107,19 +110,19 @@ fun SiteCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "${site.location} | ${site.capacityKwp} kWp",
+                    text = "${site.siteAssessments.roofType} | ${site.siteAssessments.capacityKwp} kWp",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF64748B),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = site.status,
+                    text = site.status.toCustomSentenceCase(),
                     style = MaterialTheme.typography.labelSmall,
                     color = when (site.status) {
-                        "Draft" -> GreyText
-                        "Synced" -> BlueText
-                        "Ready for review" -> OrangeText
+                        "Draft", "DRAFT"-> GreyText
+                        "Synced", "SYNCED" -> BlueText
+                        "Ready for review", "READY_FOR_REVIEW" -> OrangeText
                         else -> GreyText
                     },
                     fontWeight = FontWeight.Medium
@@ -155,6 +158,7 @@ fun SiteCard(
     }
 }
 
+/*
 @Composable
 @Preview
 fun ShowSiteCard() {
@@ -171,3 +175,4 @@ fun ShowSiteCard() {
         {}
     )
 }
+*/

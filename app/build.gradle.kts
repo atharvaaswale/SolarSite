@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -58,4 +60,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.maps.compose)
     implementation(libs.play.services.location)
+    implementation(libs.retrofit)
+    implementation(libs.converter)
+    implementation(libs.coil.compose)
 }
