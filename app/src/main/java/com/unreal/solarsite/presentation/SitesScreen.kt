@@ -3,7 +3,6 @@ package com.unreal.solarsite.presentation
 import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -17,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,13 +51,15 @@ import com.unreal.solarsite.data.dao.SitesDao
 import com.unreal.solarsite.data.remote.ApiClient
 import com.unreal.solarsite.presentation.small_components.SiteCard
 import com.unreal.solarsite.presentation.small_components.SiteItemUiModel
+import com.unreal.solarsite.ui.theme.mainGreen
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.collections.emptyList
 
 @Composable
-fun SitesScreen() {
+fun SitesScreen(
+    onAddClick: () -> Unit,
+    onEditClick: (String) -> Unit
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var sitesList by remember {mutableStateOf<List<SitesDao.Data>>(emptyList())}
@@ -75,12 +79,12 @@ fun SitesScreen() {
     val mapUiSettings = remember {
         MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false)
     }
-    val mockSites = listOf(
+    /*val mockSites by lazy { listOf(
         SiteItemUiModel("1", "Axis Industrial Roof", "Panvel, Maharashtra", 550, "Ready for Review", R.drawable.solar_site_1),
         SiteItemUiModel("2", "Sahara Logistics HUB", "Panvel, Maharashtra", 420, "Draft", R.drawable.solar_site_1),
         SiteItemUiModel("3", "Apex Distribution Facility", "Taloja MIDC", 800, "Synced", R.drawable.solar_site_1),
         SiteItemUiModel("4", "Sunway Cold Storage", "Navi Mumbai", 310, "Ready for Review", R.drawable.solar_site_1)
-    )
+    ) }*/
 
     val cameraPositionState = rememberCameraPositionState {
         // Fallback default position (Sheffield Hallam University, Owen Building) if location fails or is loading
@@ -164,15 +168,10 @@ fun SitesScreen() {
                     properties = mapProperties,
                     uiSettings = mapUiSettings
                 )
-                /*Text(
-                    text = "Map Preview Area",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF64748B)
-                )*/
             }
             // 2. Intermediate Site Count Bar
             Text(
-                text = "${mockSites.size} SITES",
+                text = "${sitesList.size} SITES",
                 style = MaterialTheme.typography.labelMedium.copy(
                     letterSpacing = 1.sp,
                     fontWeight = FontWeight.SemiBold
@@ -183,11 +182,11 @@ fun SitesScreen() {
                     .fillMaxWidth()
             )
 
-            // 3. Sites List Section (70% Height Ratio)
+            // 3. Sites List Section
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.7f)          // ← weight lives here
+                    .weight(0.7f) //List as 70% of the screen
             ) {
                 when {
                     isLoading -> {
@@ -213,21 +212,34 @@ fun SitesScreen() {
                             ) { site ->
                                 SiteCard(
                                     site = site,
-                                    onEditClick = { siteId -> /* Handle edit */ },
+                                    onEditClick = { siteId -> onEditClick(siteId) },
                                     onDeleteClick = { siteId -> /* Handle delete */ }
                                 )
                             }
                         }
                     }
                 }
-
             }
         }
+
+        ExtendedFloatingActionButton (
+            onClick = onAddClick,
+            icon = { Icon(painterResource(R.drawable.ic_add), null) },
+            text = { Text("Add Site") },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 5.dp, end = 5.dp),
+            containerColor = mainGreen,
+            contentColor = Color.White
+        )
     }
 }
 
 @Composable
 @Preview(showSystemUi = true)
 fun ShowSites() {
-    SitesScreen()
+    SitesScreen(
+        {},
+        {}
+    )
 }

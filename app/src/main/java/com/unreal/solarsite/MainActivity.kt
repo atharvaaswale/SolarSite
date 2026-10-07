@@ -28,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.unreal.solarsite.presentation.Dashboard
 import com.unreal.solarsite.presentation.SitesScreen
+import com.unreal.solarsite.presentation.navigation.AppDestinations
 import com.unreal.solarsite.presentation.navigation.SolarSiteBottomBar
 import com.unreal.solarsite.presentation.navigation.TopLevelDestination
 import com.unreal.solarsite.ui.theme.SolarSiteTheme
@@ -114,7 +115,12 @@ fun MainLayout() {
                 Dashboard(LocalContext.current)
             }
             composable(TopLevelDestination.SITES.route) {
-                SitesScreen()
+                SitesScreen(
+                    onAddClick = { navController.navigate(AppDestinations.createSiteFormRoute()) },
+                    onEditClick = { siteId ->
+                        navController.navigate(AppDestinations.createSiteFormRoute(siteId))
+                    }
+                )
             }
             composable(TopLevelDestination.SYNC.route) {
                 Text(text = "Sync Screen Content", modifier = Modifier.padding(16.dp))

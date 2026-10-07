@@ -64,5 +64,6 @@ dependencies {
     implementation(libs.converter)
     implementation(libs.coil.compose)
     implementation(libs.logging.interceptor)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
 }

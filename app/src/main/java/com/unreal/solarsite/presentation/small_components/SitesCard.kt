@@ -1,7 +1,5 @@
 package com.unreal.solarsite.presentation.small_components
 
-import android.view.RoundedCorner
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,27 +23,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.unreal.solarsite.R
 import com.unreal.solarsite.data.dao.SitesDao
 import com.unreal.solarsite.toCustomSentenceCase
-import com.unreal.solarsite.ui.theme.BlueGrey
 import com.unreal.solarsite.ui.theme.BlueText
-import com.unreal.solarsite.ui.theme.DarkBlueContainer
-import com.unreal.solarsite.ui.theme.DarkBlueText
-import com.unreal.solarsite.ui.theme.DullBlue
-import com.unreal.solarsite.ui.theme.DullOrange
 import com.unreal.solarsite.ui.theme.GreyText
 import com.unreal.solarsite.ui.theme.LightBlueContainer
-import com.unreal.solarsite.ui.theme.OrangeContainer
 import com.unreal.solarsite.ui.theme.OrangeText
 
 data class SiteItemUiModel(
