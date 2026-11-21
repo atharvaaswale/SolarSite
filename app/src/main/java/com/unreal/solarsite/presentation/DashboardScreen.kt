@@ -209,7 +209,7 @@ fun Dashboard(context: Context) {
                 item.name,
                 item.status,
                 item.iconRes,
-                { Toast.makeText(context, item.name, Toast.LENGTH_SHORT) }
+                { Toast.makeText(context, item.name, Toast.LENGTH_SHORT).show() }
             )
         }
     }

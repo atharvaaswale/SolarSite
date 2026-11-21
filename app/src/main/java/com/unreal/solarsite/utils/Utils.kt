@@ -1,4 +1,4 @@
-package com.unreal.solarsite
+package com.unreal.solarsite.utils
 
 
 fun String.toCustomSentenceCase(): String {

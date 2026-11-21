@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.unreal.solarsite.R
 import com.unreal.solarsite.data.dao.SitesDao
-import com.unreal.solarsite.toCustomSentenceCase
+import com.unreal.solarsite.utils.toCustomSentenceCase
 import com.unreal.solarsite.ui.theme.BlueText
 import com.unreal.solarsite.ui.theme.GreyText
 import com.unreal.solarsite.ui.theme.LightBlueContainer
