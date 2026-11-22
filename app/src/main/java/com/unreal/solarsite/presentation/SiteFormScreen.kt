@@ -1,5 +1,6 @@
 package com.unreal.solarsite.presentation.siteform
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,7 +24,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.unreal.solarsite.ui.theme.textRed
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import java.util.Locale
 
 private val SurfaceInputBg = Color(0xFFF1F5F9)
@@ -110,7 +113,7 @@ fun SiteFormContent(
         bottomBar = {
             Surface(color = Color.White, shadowElevation = 8.dp) {
                 Button(
-                    onClick = onSaveClick,
+                    onClick = {},//onSaveClick,
                     enabled = !uiState.isSaving && !uiState.isLoading,
                     colors = ButtonDefaults.buttonColors(containerColor = ActiveRust),
                     shape = RoundedCornerShape(14.dp),
@@ -252,32 +255,32 @@ fun SiteFormContent(
                 }
             }
 
-            // 5. Shading Condition (Segmented Pill Row)
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // 5. Shading Condition (Compact Segmented Control)
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 FieldLabel("Shading Condition")
                 val shadings = listOf("NONE" to "None", "LOW" to "Low", "MEDIUM" to "Medium", "HIGH" to "High")
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(10.dp))
                         .background(SurfaceInputBg)
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        .padding(3.dp),
+                    horizontalArrangement = Arrangement.spacedBy(3.dp)
                 ) {
                     shadings.forEach { (key, label) ->
                         val selected = uiState.shadingCondition == key
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .clip(RoundedCornerShape(9.dp))
+                                .clip(RoundedCornerShape(8.dp))
                                 .background(if (selected) ActiveRust else Color.Transparent)
                                 .clickable { onShadingChange(key) }
-                                .padding(vertical = 10.dp),
+                                .padding(vertical = 7.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = label,
-                                style = MaterialTheme.typography.labelLarge,
+                                style = MaterialTheme.typography.labelMedium,
                                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
                                 color = if (selected) Color.White else TextPrimary
                             )
@@ -289,7 +292,7 @@ fun SiteFormContent(
             // 6. Tilt & Azimuth Side-by-Side
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 SoftTextField(
                     label = "Tilt Angle (°)",
@@ -320,11 +323,15 @@ fun SiteFormContent(
 
             // 8. Roof Polygon & Calculated Area Trigger Card (Read-only)
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                val area = uiState.calculatedAreaSqm
+                val isMapped = area != null && area > 0.0
+
                 FieldLabel("Roof Boundary & Usable Area")
                 Surface(
                     onClick = onOpenBoundaryMap,
-                    color = SurfaceInputBg,
-                    shape = RoundedCornerShape(14.dp),
+                    color = if (isMapped) ActiveRust.copy(alpha = 0.08f) else SurfaceInputBg,
+                    border = if (isMapped) BorderStroke(1.dp, ActiveRust.copy(alpha = 0.35f)) else null,
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -411,7 +418,8 @@ private fun FieldLabel(text: String, required: Boolean = false) {
             Text(
                 text = "Required",
                 style = MaterialTheme.typography.labelSmall,
-                color = TextSecondary
+                color = textRed//TextSecondary
+
             )
         }
     }
@@ -504,8 +512,8 @@ private fun RoofProfileCard(
 private fun SiteFormPreview() {
     SiteFormContent(
         uiState = SiteFormUiState(
-            name = "Axis Industrial Roof",
-            clientName = "Axis Logistics Ltd",
+            name = "(e.g. Axis Industrial Roof)",
+            clientName = "(Axis Logistics Ltd)",
             calculatedAreaSqm = 420.5,
             polygonPointCount = 4
         ),

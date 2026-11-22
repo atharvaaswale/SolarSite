@@ -29,3 +29,5 @@ val OrangeText = Color(0xFF763300)
 
 
 val DarkBlueText = Color(0xFF0B1C30)
+
+val textRed = Color(0xFFE32525)
