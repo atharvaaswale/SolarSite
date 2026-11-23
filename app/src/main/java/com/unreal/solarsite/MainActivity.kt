@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -31,11 +33,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.unreal.solarsite.presentation.Dashboard
 import com.unreal.solarsite.presentation.SitesScreen
+import com.unreal.solarsite.presentation.boundary.PolygonBoundaryScreen
 import com.unreal.solarsite.presentation.navigation.AppDestinations
 import com.unreal.solarsite.presentation.navigation.SolarSiteBottomBar
 import com.unreal.solarsite.presentation.navigation.TopLevelDestination
-import com.unreal.solarsite.presentation.SiteFormScreen
+import com.unreal.solarsite.presentation.siteform.SiteFormScreen
+import com.unreal.solarsite.presentation.siteform.SiteFormViewModel
 import com.unreal.solarsite.ui.theme.SolarSiteTheme
+import org.koin.androidx.compose.koinViewModel
 import android.graphics.Color as AndroidColor
 
 class MainActivity : ComponentActivity() {
@@ -148,14 +153,69 @@ fun MainLayout() {
                 )
             ) { backStackEntry ->
                 val siteId = backStackEntry.arguments?.getString("siteId")
+                val formViewModel: SiteFormViewModel = koinViewModel()
+                val formState by formViewModel.uiState.collectAsStateWithLifecycle()
+
+                val savedStateHandle = backStackEntry.savedStateHandle
+                val returnedArea by savedStateHandle.getStateFlow<Double?>("calculated_area", null)
+                    .collectAsStateWithLifecycle()
+                val returnedGeoJson by savedStateHandle.getStateFlow<String?>("boundary_geojson", null)
+                    .collectAsStateWithLifecycle()
+                val returnedPoints by savedStateHandle.getStateFlow("point_count", 0)
+                    .collectAsStateWithLifecycle()
+                val returnedLat by savedStateHandle.getStateFlow<Double?>("centroid_lat", null)
+                    .collectAsStateWithLifecycle()
+                val returnedLng by savedStateHandle.getStateFlow<Double?>("centroid_lng", null)
+                    .collectAsStateWithLifecycle()
+
+                LaunchedEffect(returnedArea, returnedGeoJson) {
+                    if (returnedArea != null && returnedGeoJson != null) {
+                        formViewModel.onPolygonResult(
+                            areaSqm = returnedArea!!,
+                            geoJson = returnedGeoJson!!,
+                            pointCount = returnedPoints,
+                            lat = returnedLat,
+                            lng = returnedLng
+                        )
+                        savedStateHandle.remove<Double>("calculated_area")
+                        savedStateHandle.remove<String>("boundary_geojson")
+                        savedStateHandle.remove<Int>("point_count")
+                        savedStateHandle.remove<Double>("centroid_lat")
+                        savedStateHandle.remove<Double>("centroid_lng")
+                    }
+                }
+
                 SiteFormScreen(
                     siteId = siteId,
                     onBackClick = { navController.popBackStack() },
-                    onOpenBoundaryMap = { navController.navigate(AppDestinations.POLYGON_MAP) }
+                    onOpenBoundaryMap = {
+                        backStackEntry.savedStateHandle["initial_geojson"] = formState.boundaryGeoJson
+                        navController.navigate(AppDestinations.POLYGON_MAP)
+                    }
                 )
             }
             composable(TopLevelDestination.SYNC.route) {
                 Text(text = "Sync Screen Content", modifier = Modifier.padding(16.dp))
+            }
+            composable("polygon_map") {
+                val initialGeoJson = navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<String>("initial_geojson")
+
+                PolygonBoundaryScreen(
+                    initialGeoJson = initialGeoJson,
+                    onBackClick = { navController.popBackStack() },
+                    onConfirmBoundary = { result ->
+                        navController.previousBackStackEntry?.savedStateHandle?.apply {
+                            set("calculated_area", result.areaSqm)
+                            set("boundary_geojson", result.geoJsonString)
+                            set("point_count", result.pointCount)
+                            set("centroid_lat", result.centroidLat)
+                            set("centroid_lng", result.centroidLng)
+                        }
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

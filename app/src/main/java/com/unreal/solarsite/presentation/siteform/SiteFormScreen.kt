@@ -1,4 +1,4 @@
-package com.unreal.solarsite.presentation
+package com.unreal.solarsite.presentation.siteform
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -24,8 +24,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.unreal.solarsite.presentation.siteform.SiteFormUiState
-import com.unreal.solarsite.presentation.siteform.SiteFormViewModel
 import com.unreal.solarsite.ui.theme.textRed
 import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
@@ -324,72 +322,69 @@ fun SiteFormContent(
                 keyboardType = KeyboardType.Decimal
             )
 
-            // 8. Roof Polygon & Calculated Area Trigger Card (Read-only)
+            // 8. Roof Boundary & Usable Area
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 val area = uiState.calculatedAreaSqm
                 val isMapped = area != null && area > 0.0
+                val displayValue = if (isMapped && uiState.latitude != null && uiState.longitude != null) {
+                    String.format(
+                        Locale.US,
+                        "%.2f m²  (%.5f, %.5f)",
+                        area,
+                        uiState.latitude,
+                        uiState.longitude
+                    )
+                } else if (isMapped) {
+                    String.format(Locale.US, "%.2f m² (%d pts)", area, uiState.polygonPointCount)
+                } else {
+                    ""
+                }
 
                 FieldLabel("Roof Boundary & Usable Area")
-                Surface(
-                    onClick = onOpenBoundaryMap,
-                    color = if (isMapped) ActiveRust.copy(alpha = 0.08f) else SurfaceInputBg,
-                    border = if (isMapped) BorderStroke(1.dp, ActiveRust.copy(alpha = 0.35f)) else null,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .clickable { onOpenBoundaryMap() }
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(
-                                    if (uiState.calculatedAreaSqm != null) ActiveRust.copy(alpha = 0.12f)
-                                    else Color.White
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
+                    TextField(
+                        value = displayValue,
+                        onValueChange = {},
+                        readOnly = true,
+                        enabled = false,
+                        singleLine = true,
+                        placeholder = {
+                            Text(
+                                text = "Tap to draw roof boundary on map",
+                                color = TextSecondary.copy(alpha = 0.9f)
+                            )
+                        },
+                        leadingIcon = {
                             Icon(
-                                imageVector = Icons.Default.Map,
+                                imageVector = if (isMapped) Icons.Default.CheckCircle else Icons.Default.Map,
                                 contentDescription = null,
-                                tint = ActiveRust
+                                tint = if (isMapped) ActiveRust else TextSecondary
                             )
-                        }
-                        Spacer(modifier = Modifier.width(14.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            val area = uiState.calculatedAreaSqm
-                            Text(
-                                text = if (area != null && area > 0.0) {
-                                    String.format(Locale.US, "%.2f m²", area)
-                                } else {
-                                    "Draw Roof Boundary on Map"
-                                },
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = TextPrimary
+                        },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = null,
+                                tint = if (isMapped) ActiveRust else TextSecondary
                             )
-                            Text(
-                                text = if (area != null && area > 0.0) {
-                                    "${uiState.polygonPointCount} vertices mapped • Tap to adjust"
-                                } else {
-                                    "Tap to drop pins and auto-calculate area"
-                                },
-                                style = MaterialTheme.typography.bodySmall,
-                                color = TextSecondary
-                            )
-                        }
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = null,
-                            tint = TextSecondary
-                        )
-                    }
+                        },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = TextFieldDefaults.colors(
+                            disabledContainerColor = if (isMapped) ActiveRust.copy(alpha = 0.08f) else SurfaceInputBg,
+                            disabledTextColor = TextPrimary,
+                            disabledIndicatorColor = Color.Transparent,
+                            disabledLeadingIconColor = if (isMapped) ActiveRust else TextSecondary,
+                            disabledTrailingIconColor = if (isMapped) ActiveRust else TextSecondary
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
-
             // 9. Survey Notes
             SoftTextField(
                 label = "Survey Notes",
