@@ -2,6 +2,9 @@ package com.unreal.solarsite.presentation.siteform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.JsonParser
+import com.unreal.solarsite.data.dao.AssessmentRequest
+import com.unreal.solarsite.data.dao.UpsertSiteRequest
 import com.unreal.solarsite.data.repository.SitesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -85,10 +88,43 @@ class SiteFormViewModel(
             return
         }
 
+        val parsedGeoJson = current.boundaryGeoJson?.let { raw ->
+            runCatching { JsonParser.parseString(raw) }.getOrNull()
+        }
+
+        val request = UpsertSiteRequest(
+            name = current.name.trim(),
+            clientName = current.clientName.trim(),
+            status = current.status,
+            latitude = current.latitude,
+            longitude = current.longitude,
+            boundaryGeoJson = parsedGeoJson,
+            assessment = AssessmentRequest(
+                roofType = current.roofType,
+                tiltDegrees = current.tiltDegrees.toIntOrNull() ?: 10,
+                azimuthDegrees = current.azimuthDegrees.toIntOrNull() ?: 180,
+                shadingCondition = current.shadingCondition,
+                capacityKwp = current.capacityKwp.toDoubleOrNull(),
+                calculatedAreaSqm = current.calculatedAreaSqm,
+                notes = current.notes.trim().ifBlank { null }
+            )
+        )
+
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
-            // Hook your repository.createSite(...) / repository.updateSite(...) call here
-            // For now simulates completion until you connect the POST/PUT Retrofit methods
+            val result = if (current.isEditMode && current.siteId != null) {
+                repository.updateSite(current.siteId, request)
+            } else {
+                repository.createSite(request)
+            }
+
+            result
+                .onSuccess {
+                    _uiState.update { it.copy(isSaving = false, isSavedSuccess = true) }
+                }
+                .onFailure { err ->
+                    _uiState.update { it.copy(isSaving = false, error = err.message ?: "Save failed") }
+                }
             _uiState.update { it.copy(isSaving = false, isSavedSuccess = true) }
         }
     }

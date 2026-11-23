@@ -1,4 +1,4 @@
-package com.unreal.solarsite.presentation.siteform
+package com.unreal.solarsite.presentation
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -24,9 +24,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.unreal.solarsite.presentation.siteform.SiteFormUiState
+import com.unreal.solarsite.presentation.siteform.SiteFormViewModel
 import com.unreal.solarsite.ui.theme.textRed
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 import java.util.Locale
 
 private val SurfaceInputBg = Color(0xFFF1F5F9)
@@ -113,7 +114,7 @@ fun SiteFormContent(
         bottomBar = {
             Surface(color = Color.White, shadowElevation = 8.dp) {
                 Button(
-                    onClick = {},//onSaveClick,
+                    onClick = onSaveClick,
                     enabled = !uiState.isSaving && !uiState.isLoading,
                     colors = ButtonDefaults.buttonColors(containerColor = ActiveRust),
                     shape = RoundedCornerShape(14.dp),
@@ -156,6 +157,8 @@ fun SiteFormContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)
@@ -443,7 +446,7 @@ private fun SoftTextField(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholder, color = TextSecondary.copy(alpha = 0.7f)) },
+            placeholder = { Text(placeholder, color = TextSecondary.copy(alpha = 0.9f)) },
             leadingIcon = leadingIcon?.let {
                 { Icon(imageVector = it, contentDescription = null, tint = TextSecondary) }
             },
@@ -461,6 +464,7 @@ private fun SoftTextField(
                 cursorColor = ActiveRust
             ),
             modifier = Modifier.fillMaxWidth()
+
         )
     }
 }
@@ -513,7 +517,7 @@ private fun SiteFormPreview() {
     SiteFormContent(
         uiState = SiteFormUiState(
             name = "(e.g. Axis Industrial Roof)",
-            clientName = "(Axis Logistics Ltd)",
+            clientName = "(e.g. Axis Logistics Ltd)",
             calculatedAreaSqm = 420.5,
             polygonPointCount = 4
         ),

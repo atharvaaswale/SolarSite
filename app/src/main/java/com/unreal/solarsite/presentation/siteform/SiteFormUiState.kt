@@ -8,8 +8,8 @@ data class SiteFormUiState(
     val status: String = "DRAFT", // DRAFT, READY_FOR_REVIEW, SYNCED
     val roofType: String = "FLAT_CONCRETE", // FLAT_CONCRETE, METAL_SHEET, TILE, OTHER
     val shadingCondition: String = "NONE", // NONE, LOW, MEDIUM, HIGH
-    val tiltDegrees: String = "10",
-    val azimuthDegrees: String = "180",
+    val tiltDegrees: String = "",
+    val azimuthDegrees: String = "",
     val capacityKwp: String = "",
     val calculatedAreaSqm: Double? = null,
     val polygonPointCount: Int = 0,

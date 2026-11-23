@@ -1,6 +1,5 @@
 package com.unreal.solarsite
 
-import android.R.attr.type
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -35,7 +34,7 @@ import com.unreal.solarsite.presentation.SitesScreen
 import com.unreal.solarsite.presentation.navigation.AppDestinations
 import com.unreal.solarsite.presentation.navigation.SolarSiteBottomBar
 import com.unreal.solarsite.presentation.navigation.TopLevelDestination
-import com.unreal.solarsite.presentation.siteform.SiteFormScreen
+import com.unreal.solarsite.presentation.SiteFormScreen
 import com.unreal.solarsite.ui.theme.SolarSiteTheme
 import android.graphics.Color as AndroidColor
 
