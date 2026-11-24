@@ -11,10 +11,18 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @GET("/api/sites")
     suspend fun getSites(): Response<SitesDao>
+
+    @GET("/api/sites")
+    suspend fun getRecentSites(
+        @Query("sort") sort: String = "updated_at",
+        @Query("order") order: String = "desc",
+        @Query("limit") limit: Int = 5
+    ): Response<SitesDao>
 
     @GET("/api/sites/{id}")
     suspend fun getSiteById(@Path("id") id: String): Response<SingleSiteResponse>

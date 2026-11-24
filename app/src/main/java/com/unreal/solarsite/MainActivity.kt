@@ -31,7 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.unreal.solarsite.presentation.Dashboard
+import com.unreal.solarsite.presentation.dashboard.DashboardScreen
 import com.unreal.solarsite.presentation.SitesScreen
 import com.unreal.solarsite.presentation.boundary.PolygonBoundaryScreen
 import com.unreal.solarsite.presentation.navigation.AppDestinations
@@ -132,7 +132,16 @@ fun MainLayout() {
             )
         ) {
             composable(TopLevelDestination.HOME.route) {
-                Dashboard(LocalContext.current)
+                DashboardScreen(
+                    onNewSurveyClick = { navController.navigate("site_form") },
+                    onSiteClick = { siteId -> navController.navigate("site_form?siteId=$siteId") },
+                    onSeeAllSitesClick = {
+                        // Navigate to your Sites tab route
+                        navController.navigate("sites") {
+                            launchSingleTop = true
+                        }
+                    }
+                )
             }
             composable(TopLevelDestination.SITES.route) {
                 SitesScreen(

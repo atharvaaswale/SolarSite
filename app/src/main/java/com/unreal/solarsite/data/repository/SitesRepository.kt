@@ -12,6 +12,15 @@ class SitesRepository(private val api: ApiService) {
         else error("Failed to load sites (${res.code()})")
     }
 
+    suspend fun getRecentSites(limit: Int = 5): Result<List<SitesDao.Data>> = runCatching {
+        val response = api.getRecentSites(limit = limit)
+        val body = response.body()
+        if (!response.isSuccessful || body == null || !body.success) {
+            throw Exception("Failed to fetch recent sites (${response.code()})")
+        }
+        body.data ?: emptyList()
+    }
+
     suspend fun getSiteById(id: String): Result<SitesDao.Data> = runCatching {
         val response = api.getSiteById(id)
         val body = response.body()
