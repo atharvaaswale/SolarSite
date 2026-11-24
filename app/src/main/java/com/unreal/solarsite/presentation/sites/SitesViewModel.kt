@@ -1,6 +1,5 @@
-package com.unreal.solarsite.presentation
+package com.unreal.solarsite.presentation.sites
 
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unreal.solarsite.data.dao.SitesDao
@@ -28,6 +27,18 @@ class SitesViewModel(private val repo: SitesRepository): ViewModel() {
             repo.getSites()
                 .onSuccess { list -> _state.update { it.copy(sites = list, isLoading = false) } }
                 .onFailure { e -> _state.update { it.copy(error = e.message, isLoading = false) } }
+        }
+    }
+
+    fun deleteSite(siteId: String) {
+        viewModelScope.launch {
+            repo.deleteSite(siteId)
+                .onSuccess {
+                    loadSites() // Refresh the list after deletion
+                }
+                .onFailure { err ->
+                    _state.update { it.copy(error = err.message ?: "Failed to delete site") }
+                }
         }
     }
 }

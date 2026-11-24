@@ -19,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,7 +31,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.unreal.solarsite.presentation.dashboard.DashboardScreen
-import com.unreal.solarsite.presentation.SitesScreen
+import com.unreal.solarsite.presentation.sites.SitesScreen
 import com.unreal.solarsite.presentation.boundary.PolygonBoundaryScreen
 import com.unreal.solarsite.presentation.navigation.AppDestinations
 import com.unreal.solarsite.presentation.navigation.SolarSiteBottomBar

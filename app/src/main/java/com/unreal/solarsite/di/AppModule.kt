@@ -2,7 +2,7 @@ package com.unreal.solarsite.di
 
 import com.unreal.solarsite.data.remote.ApiClient
 import com.unreal.solarsite.data.repository.SitesRepository
-import com.unreal.solarsite.presentation.SitesViewModel
+import com.unreal.solarsite.presentation.sites.SitesViewModel
 import com.unreal.solarsite.presentation.boundary.PolygonBoundaryViewModel
 import com.unreal.solarsite.presentation.dashboard.DashboardViewModel
 import com.unreal.solarsite.presentation.siteform.SiteFormViewModel

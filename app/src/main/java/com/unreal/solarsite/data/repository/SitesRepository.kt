@@ -21,7 +21,7 @@ class SitesRepository(private val api: ApiService) {
         body.data ?: emptyList()
     }
 
-    suspend fun getSiteById(id: String): Result<SitesDao.Data> = runCatching {
+        suspend fun getSiteById(id: String): Result<SitesDao.Data> = runCatching {
         val response = api.getSiteById(id)
         val body = response.body()
         if (!response.isSuccessful || body == null || !body.success || body.data == null) {

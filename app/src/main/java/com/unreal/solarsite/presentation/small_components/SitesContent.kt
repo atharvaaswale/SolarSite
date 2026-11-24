@@ -4,9 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,13 +14,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
 import com.unreal.solarsite.R
-import com.unreal.solarsite.presentation.SitesUiState
-import com.unreal.solarsite.presentation.small_components.SiteCard
+import com.unreal.solarsite.data.dao.SitesDao
+import com.unreal.solarsite.presentation.sites.SitesUiState
 import com.unreal.solarsite.ui.theme.mainGreen
 
 @Composable
@@ -30,13 +29,41 @@ fun SitesContent(
     hasLocationPermission: Boolean,
     onAddClick: () -> Unit,
     onEditClick: (String) -> Unit,
+    onDeleteConfirm: (String) -> Unit,
     onRetry: () -> Unit
 ) {
+    var siteToDelete by remember { mutableStateOf<SitesDao.Data?>(null) }
+
     val mapProperties = remember(hasLocationPermission) {
         MapProperties(isMyLocationEnabled = hasLocationPermission)
     }
     val mapUiSettings = remember {
         MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false)
+    }
+
+    // Move camera to the first site with a polygon (or valid lat/lng) once sites load
+    LaunchedEffect(state.sites) {
+        val targetSite = state.sites.firstOrNull { site ->
+            !site.boundaryGeojson?.coordinates?.firstOrNull().isNullOrEmpty() ||
+                    (site.latitude != null && site.longitude != null)
+        } ?: return@LaunchedEffect
+
+        val firstRingPoint = targetSite.boundaryGeojson?.coordinates
+            ?.firstOrNull()
+            ?.firstOrNull()
+            ?.takeIf { it.size >= 2 }
+
+        val targetLatLng = if (firstRingPoint != null) {
+            // GeoJSON coordinates are [longitude, latitude]
+            LatLng(firstRingPoint[1], firstRingPoint[0])
+        } else {
+            LatLng(targetSite.latitude!!, targetSite.longitude!!)
+        }
+
+        cameraPositionState.animate(
+            update = CameraUpdateFactory.newLatLngZoom(targetLatLng, 16f),
+            durationMs = 600
+        )
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -52,7 +79,25 @@ fun SitesContent(
                     cameraPositionState = cameraPositionState,
                     properties = mapProperties,
                     uiSettings = mapUiSettings
-                )
+                ) {
+                    // Draw all saved site polygons on the map
+                    state.sites.forEach { site ->
+                        val ring = site.boundaryGeojson?.coordinates?.firstOrNull().orEmpty()
+                        val points = remember(site.id, ring) {
+                            ring.mapNotNull { coord ->
+                                if (coord.size >= 2) LatLng(coord[1], coord[0]) else null
+                            }
+                        }
+                        if (points.size >= 3) {
+                            Polygon(
+                                points = points,
+                                fillColor = mainGreen.copy(alpha = 0.25f),
+                                strokeColor = mainGreen,
+                                strokeWidth = 4f
+                            )
+                        }
+                    }
+                }
             }
 
             Text(
@@ -67,7 +112,11 @@ fun SitesContent(
                     .fillMaxWidth()
             )
 
-            Box(Modifier.fillMaxWidth().weight(0.7f)) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(0.7f)
+            ) {
                 when {
                     state.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
 
@@ -89,7 +138,7 @@ fun SitesContent(
                             SiteCard(
                                 site = site,
                                 onEditClick = onEditClick,
-                                onDeleteClick = { /* TODO: viewModel.deleteSite(it) */ }
+                                onDeleteClick = { siteToDelete = site }
                             )
                         }
                     }
@@ -106,6 +155,55 @@ fun SitesContent(
                 .padding(bottom = 5.dp, end = 5.dp),
             containerColor = mainGreen,
             contentColor = Color.White
+        )
+    }
+
+    // Delete Confirmation Popup
+    siteToDelete?.let { site ->
+        AlertDialog(
+            onDismissRequest = { siteToDelete = null },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(16.dp),
+            title = {
+                Text(
+                    text = "Delete Site?",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0F172A)
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to delete \"${site.name}\"? This action cannot be undone.",
+                    color = Color(0xFF475569)
+                )
+            },
+            dismissButton = {
+                Button(
+                    onClick = { siteToDelete = null },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFF1F5F9),
+                        contentColor = Color(0xFF475569)
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Cancel", fontWeight = FontWeight.SemiBold)
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDeleteConfirm(site.id)
+                        siteToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFDC2626),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Delete", fontWeight = FontWeight.SemiBold)
+                }
+            }
         )
     }
 }

@@ -2,6 +2,7 @@ package com.unreal.solarsite.data.dao
 
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
 data class UpsertSiteRequest(
     @SerializedName("name") val name: String,
@@ -22,7 +23,7 @@ data class AssessmentRequest(
     @SerializedName("calculated_area_sqm") val calculatedAreaSqm: Double?,
     @SerializedName("notes") val notes: String?
 )
-
+@Serializable
 data class SingleSiteResponse(
     @SerializedName("success") val success: Boolean,
     @SerializedName("message") val message: String? = null,

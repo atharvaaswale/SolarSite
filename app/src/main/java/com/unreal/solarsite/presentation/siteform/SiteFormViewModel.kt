@@ -2,6 +2,7 @@ package com.unreal.solarsite.presentation.siteform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.unreal.solarsite.data.dao.AssessmentRequest
 import com.unreal.solarsite.data.dao.UpsertSiteRequest
@@ -16,6 +17,7 @@ class SiteFormViewModel(
     private val repository: SitesRepository
 ) : ViewModel() {
 
+    private val gson = Gson()
     private val _uiState = MutableStateFlow(SiteFormUiState())
     val uiState: StateFlow<SiteFormUiState> = _uiState.asStateFlow()
 
@@ -25,23 +27,32 @@ class SiteFormViewModel(
         _uiState.update { it.copy(isEditMode = true, siteId = siteId, isLoading = true, error = null) }
 
         viewModelScope.launch {
-            // Replace with repository.getSiteById(siteId) once wired in SitesRepository
+/*
             repository.getSites()
                 .onSuccess { list ->
                     val site = list.find { it.id == siteId }
                     if (site != null) {
                         val assessment = site.siteAssessments
+                        val ring = site.boundaryGeojson?.coordinates?.firstOrNull().orEmpty()
+                        val pointCount = if (ring.size > 1 && ring.first() == ring.last()) {
+                            ring.size - 1
+                        } else {
+                            ring.size
+                        }
+                        val validGeoJson = site.boundaryGeojson?.let { gson.toJson(it) }
+
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                name = site.name ?: "",
-                                clientName = site.clientName ?: "",
-                                status = site.status ?: "DRAFT",
+                                name = site.name,
+                                clientName = site.clientName,
+                                status = site.status.uppercase(),
                                 latitude = site.latitude,
                                 longitude = site.longitude,
-                                boundaryGeoJson = site.boundaryGeojson?.toString(),
-                                roofType = assessment?.roofType ?: "FLAT_CONCRETE",
-                                shadingCondition = assessment?.shadingCondition ?: "NONE",
+                                boundaryGeoJson = validGeoJson,
+                                polygonPointCount = pointCount,
+                                roofType = normalizeRoofType(assessment?.roofType),
+                                shadingCondition = assessment?.shadingCondition?.uppercase() ?: "NONE",
                                 tiltDegrees = (assessment?.tiltDegrees ?: 10).toString(),
                                 azimuthDegrees = (assessment?.azimuthDegrees ?: 180).toString(),
                                 capacityKwp = assessment?.capacityKwp?.toString() ?: "",
@@ -51,6 +62,41 @@ class SiteFormViewModel(
                         }
                     } else {
                         _uiState.update { it.copy(isLoading = false, error = "Site not found") }
+                    }
+                }
+                .onFailure { err ->
+                    _uiState.update { it.copy(isLoading = false, error = err.message ?: "Failed to load site") }
+                }
+*/
+            repository.getSiteById(siteId)
+                .onSuccess { site ->
+                    val assessment = site.siteAssessments
+                    val ring = site.boundaryGeojson?.coordinates?.firstOrNull().orEmpty()
+                    val pointCount = if (ring.size > 1 && ring.first() == ring.last()) {
+                        ring.size - 1
+                    } else {
+                        ring.size
+                    }
+                    val validGeoJson = site.boundaryGeojson?.let { gson.toJson(it) }
+
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            name = site.name,
+                            clientName = site.clientName,
+                            status = site.status.uppercase(),
+                            latitude = site.latitude,
+                            longitude = site.longitude,
+                            boundaryGeoJson = validGeoJson,
+                            polygonPointCount = pointCount,
+                            roofType = normalizeRoofType(assessment?.roofType),
+                            shadingCondition = assessment?.shadingCondition?.uppercase() ?: "NONE",
+                            tiltDegrees = (assessment?.tiltDegrees ?: 10).toString(),
+                            azimuthDegrees = (assessment?.azimuthDegrees ?: 180).toString(),
+                            capacityKwp = assessment?.capacityKwp?.toString() ?: "",
+                            calculatedAreaSqm = assessment?.calculatedAreaSqm,
+                            notes = assessment?.notes ?: ""
+                        )
                     }
                 }
                 .onFailure { err ->
@@ -125,7 +171,14 @@ class SiteFormViewModel(
                 .onFailure { err ->
                     _uiState.update { it.copy(isSaving = false, error = err.message ?: "Save failed") }
                 }
-            _uiState.update { it.copy(isSaving = false, isSavedSuccess = true) }
         }
+    }
+
+    private fun normalizeRoofType(raw: String?): String = when (raw?.trim()?.uppercase()) {
+        "FLAT_CONCRETE", "RCC FLAT" -> "FLAT_CONCRETE"
+        "METAL_SHEET", "METAL DECK", "STANDING SEAM METAL" -> "METAL_SHEET"
+        "TILE", "CLAY TILE" -> "TILE"
+        "OTHER" -> "OTHER"
+        else -> "FLAT_CONCRETE"
     }
 }

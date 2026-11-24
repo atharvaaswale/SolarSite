@@ -1,4 +1,4 @@
-package com.unreal.solarsite.presentation
+package com.unreal.solarsite.presentation.sites
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,6 +29,7 @@ fun SitesScreen(
         hasLocationPermission = hasLocationPermission,
         onAddClick = onAddClick,
         onEditClick = onEditClick,
+        onDeleteConfirm = viewModel::deleteSite,
         onRetry = viewModel::loadSites
     )
 }

@@ -221,7 +221,7 @@ private fun ActiveSurveysSlider(
     LaunchedEffect(pageCount) {
         if (pageCount > 1) {
             while (true) {
-                delay(4000L)
+                delay(3000L)
                 val nextPage = (pagerState.currentPage + 1) % pageCount
                 pagerState.animateScrollToPage(nextPage)
             }

@@ -4,10 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,11 +33,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.unreal.solarsite.R
 import com.unreal.solarsite.data.dao.SitesDao
-import com.unreal.solarsite.utils.toCustomSentenceCase
 import com.unreal.solarsite.ui.theme.BlueText
 import com.unreal.solarsite.ui.theme.GreyText
 import com.unreal.solarsite.ui.theme.LightBlueContainer
 import com.unreal.solarsite.ui.theme.OrangeText
+import com.unreal.solarsite.utils.toCustomSentenceCase
 
 data class SiteItemUiModel(
     val id: String,
@@ -43,7 +45,7 @@ data class SiteItemUiModel(
     val location: String,
     val capacityKwp: Int,
     val status: String,
-    val imageRes: Int? = null // local drawable or placeholder
+    val imageRes: Int? = null
 )
 
 @Composable
@@ -53,41 +55,45 @@ fun SiteCard(
     onDeleteClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val subtleIconTint = Color(0xFF9CA3AF) // Softer muted grey so icons don't glare
+
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         color = Color.White,
         shadowElevation = 1.dp,
-        onClick = {}
+        onClick = { onEditClick(site.id) }
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 1. Edge-to-edge Left Image (fills top, bottom, and left completely)
             Box(
                 modifier = Modifier
-                    .size(60.dp)
-                    .background(
-                        color = LightBlueContainer,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
+                    .width(96.dp)
+                    .fillMaxHeight()
+                    .background(color = LightBlueContainer),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
                     model = site.primaryImageUrl,
-                    contentDescription = "leadingIcon",
+                    contentDescription = site.name,
+                    placeholder = painterResource(R.drawable.solar_site_1),
+                    error = painterResource(R.drawable.solar_site_1),
+                    fallback = painterResource(R.drawable.solar_site_1),
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
-
             // 2. Main Site Info
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
@@ -111,7 +117,7 @@ fun SiteCard(
                     text = site.status.toCustomSentenceCase(),
                     style = MaterialTheme.typography.labelSmall,
                     color = when (site.status) {
-                        "Draft", "DRAFT"-> GreyText
+                        "Draft", "DRAFT" -> GreyText
                         "Synced", "SYNCED" -> BlueText
                         "Ready for review", "READY_FOR_REVIEW" -> OrangeText
                         else -> GreyText
@@ -120,50 +126,38 @@ fun SiteCard(
                 )
             }
 
-            // 3. Action Buttons
-            Column {
+            // 3. Subtle Action Buttons
+            Column(
+                modifier = Modifier.padding(end = 8.dp, top = 6.dp, bottom = 6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 IconButton(
                     onClick = { onEditClick(site.id) },
-                    modifier = Modifier.size(36.dp).clip(CircleShape)
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_edit),
                         contentDescription = "Edit Site",
-                        tint = Color(0xFF71717A),
-                        modifier = Modifier.size(22.dp)
+                        tint = subtleIconTint,
+                        modifier = Modifier.size(19.dp)
                     )
                 }
                 IconButton(
                     onClick = { onDeleteClick(site.id) },
-                    modifier = Modifier.size(36.dp).clip(CircleShape)
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_delete),
                         contentDescription = "Delete Site",
-                        tint = Color(0xFF71717A),
-                        modifier = Modifier.size(22.dp)
+                        tint = subtleIconTint,
+                        modifier = Modifier.size(19.dp)
                     )
                 }
             }
         }
     }
 }
-
-/*
-@Composable
-@Preview
-fun ShowSiteCard() {
-    SiteCard(
-        SiteItemUiModel(
-            id = "1",
-            name = "Northstar Manufacturing",
-            location = "Panvel",
-            capacityKwp = 95,
-            status = "Ready for review",
-            imageRes = R.drawable.solar_site_1
-        ),
-        {},
-        {}
-    )
-}
-*/

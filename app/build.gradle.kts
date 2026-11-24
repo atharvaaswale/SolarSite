@@ -71,4 +71,5 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.maps.compose.utils)
+    implementation(libs.kotlinx.serialization.json)
 }
